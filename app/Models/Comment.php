@@ -9,6 +9,12 @@ class Comment extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'post_id',
+        'author',
+        'text',
+    ];
+
     // Relación inversa
     public function post()
     {

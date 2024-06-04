@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class PostController extends Controller
 {
     // Crear comentario y asignarlo a un post usando el post_id en el cuerpo de la solicitud
-    public function store(Request $request)
+    public function createComment(Request $request)
     {
         try {
             $validatedData = $request->validate([
@@ -41,7 +41,7 @@ class PostController extends Controller
     }
 
     // Retornar un post junto con sus comentarios usando el id del post en los parámetros de la URL
-    public function show($id)
+    public function getPostById($id)
     {
         try {
             $post = Post::with('comments')->findOrFail($id);
