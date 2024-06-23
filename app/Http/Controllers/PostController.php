@@ -30,7 +30,6 @@ class PostController extends Controller
                 'message' => 'Comment created successfully',
                 'data' => $comment,
             ], 201);
-
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
@@ -51,7 +50,6 @@ class PostController extends Controller
                 'message' => 'Post retrieved successfully',
                 'data' => $post,
             ], 200);
-
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
