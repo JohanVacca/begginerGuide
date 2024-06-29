@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\PostController;
@@ -32,3 +33,12 @@ Route::get('/courses/get-all', [CoursesController::class, 'getAllCourses']);
 Route::get('/courses/get-all-without-students', [CoursesController::class, 'getExistingCourses']);
 Route::put('/courses/edit/{course_id}', [CoursesController::class, 'updateCourse']);
 Route::delete('/courses/delete/{course_id}', [CoursesController::class, 'deleteCourse']);
+
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/login', [AuthController::class, 'login']);
+
+// Rutas protegidas con Sanctum(autenticación)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/try', [AuthController::class, 'tryAuth']);
+});
