@@ -41,4 +41,14 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/try', [AuthController::class, 'tryAuth']);
+
+    // Ruta protegida con permiso 'usar api general'
+    Route::post('/auth/tryRoleUser', [AuthController::class, 'tryRoleUser'])->middleware('permission:usar api general');
+
+    // Grupo de rutas protegidas con el rol admin (autorización)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('/auth/tryRoleAdmin', [AuthController::class, 'tryRoleAdmin']);
+        Route::put('auth/user/{id}', [AuthController::class, 'update']);
+        // Puedes agregar más rutas aquí que necesiten el rol admin para acceder
+    });
 });
