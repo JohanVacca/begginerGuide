@@ -44,11 +44,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Ruta protegida con permiso 'usar api general'
     Route::post('/auth/tryRoleUser', [AuthController::class, 'tryRoleUser'])->middleware('permission:usar api general');
+    Route::put('auth/user/{id}', [AuthController::class, 'update']);
 
     // Grupo de rutas protegidas con el rol admin (autorización)
     Route::middleware(['role:admin'])->group(function () {
         Route::post('/auth/tryRoleAdmin', [AuthController::class, 'tryRoleAdmin']);
-        Route::put('auth/user/{id}', [AuthController::class, 'update']);
+        Route::get('auth/user/getUsers', [AuthController::class, 'getUsers']);
+
+        Route::get('/auth/getRolesWithPermissions', [AuthController::class, 'getRolesWithPermissions']);
+        Route::post('/auth/updateRolePermissions/{id}', [AuthController::class, 'updateRolePermissions']);
+
         // Puedes agregar más rutas aquí que necesiten el rol admin para acceder
     });
 });

@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -86,6 +87,81 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Usuario actualizado correctamente',
                 'data' => $user,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], 500);
+        }
+    }
+
+    /**
+     * Actualiza los permisos de un rol en el sistema.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function updateRolePermissions(Request $request, $id): JsonResponse
+    {
+        try {
+            $validatedData = $request->validate([
+                'permissions' => 'required|array',
+                'permissions.*' => 'string|exists:permissions,name', // Validar que cada permiso exista
+            ]);
+
+            // Encontrar el rol
+            $role = Role::findOrFail($id);
+
+            // Sincronizar los permisos del rol
+            $role->syncPermissions($validatedData['permissions']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permisos del rol actualizados correctamente',
+                'data' => $role->permissions, // Retornar los permisos actualizados del rol
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtiene todos los usuarios junto con sus roles y permisos.
+     *
+     * @return JsonResponse
+     */
+    public function getUsers(): JsonResponse
+    {
+        try {
+            // Obtener todos los usuarios con sus roles y permisos
+            $users = User::with(['roles', 'roles.permissions'])->get();
+
+            // Formatear la respuesta para incluir los roles y permisos
+            $formattedUsers = $users->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->roles->map(function ($role) {
+                        return [
+                            'name' => $role->name,
+                            'permissions' => $role->permissions->pluck('name')
+                        ];
+                    }),
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Usuarios, roles y permisos obtenidos correctamente',
+                'data' => $formattedUsers,
             ], 200);
         } catch (Exception $e) {
             return response()->json([
